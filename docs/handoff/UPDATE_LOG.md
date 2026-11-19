@@ -1526,3 +1526,17 @@ Completed the Prototype Network Testing Readiness Sprint to prepare the prototyp
 ## Public repository import
 
 Imported the web app, API, SkyMesh Scout dashboard, and CAP-inspired training board from the latest component archives. Added a screenshot gallery, local setup instructions, and CI. Fixed Settings startup, API test isolation, API client demo authentication, and SkyMesh dashboard startup errors.
+# November 19, 2026 engineering review
+
+Confirmed complete web/API and demo component sources; native Expo/Go remain
+scaffolds. Added production startup/HTTP lockout without creating real auth or
+encryption, strict Bearer parsing, and privacy-safe central JSON errors preserving
+400/413 status. Added actual-entry-point, HTTP and privacy regressions.
+
+Executed: frontend 122 tests and production build; API typecheck, 23 tests and
+integrated smoke after rebuilding the required SQLite native dependency; training
+board suites and SkyMesh Python compilation. Web/API npm audits each reported zero
+entries. The first API test failed because --ignore-scripts omitted SQLite's native
+binding; rebuilding that dependency resolved it. Go compilation is blocked by the
+available command/toolchain. No real calls, native hardware or fresh screenshots
+were tested. Exact-commit CI and the Windows checklist remain review evidence.

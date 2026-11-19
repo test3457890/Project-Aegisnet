@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeAll, afterAll } from 'vitest';
+import { describe, it, expect, beforeAll, afterAll, vi } from 'vitest';
 import request from 'supertest';
 import { mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
@@ -63,6 +63,47 @@ describe('AegisNet API Routes', () => {
       .send({ name: 'Hacker' });
     
     expect(res.status).toBe(401);
+  });
+
+  it('rejects non-Bearer and ambiguous demo authorization headers', async () => {
+    for (const authorization of ['Basic user_me', 'Bearer user_me extra', 'Bearer  user_me']) {
+      const res = await request(app).get('/users/me').set('Authorization', authorization);
+      expect(res.status).toBe(401);
+    }
+  });
+
+  it('denies production HTTP access even when the app is imported directly', async () => {
+    const previous = process.env.NODE_ENV;
+    process.env.NODE_ENV = 'production';
+    try {
+      const res = await request(app).get('/users/me').set('Authorization', 'Bearer user_me');
+      expect(res.status).toBe(503);
+    } finally {
+      if (previous === undefined) delete process.env.NODE_ENV;
+      else process.env.NODE_ENV = previous;
+    }
+  });
+
+  it('returns 400 for malformed JSON without echoing or logging its private body', async () => {
+    const log = vi.spyOn(console, 'error').mockImplementation(() => {});
+    try {
+      const res = await request(app).post('/auth/demo-login')
+        .set('Content-Type', 'application/json').send('{"secret":"PRIVATE_FIXTURE"');
+      expect(res.status).toBe(400);
+      expect(JSON.stringify(res.body)).not.toContain('PRIVATE_FIXTURE');
+      expect(JSON.stringify(log.mock.calls)).not.toContain('PRIVATE_FIXTURE');
+      expect(res.body.requestId).toBeTruthy();
+    } finally { log.mockRestore(); }
+  });
+
+  it('preserves the JSON payload limit as a 413 response', async () => {
+    const log = vi.spyOn(console, 'error').mockImplementation(() => {});
+    try {
+      const res = await request(app).post('/auth/demo-login')
+        .set('Content-Type', 'application/json').send('x'.repeat(1024 * 1024 + 1));
+      expect(res.status).toBe(413);
+      expect(res.body.error).toBe('The request is too large.');
+    } finally { log.mockRestore(); }
   });
 
   it('derives actor from auth context for moderation and rejects non-admin', async () => {

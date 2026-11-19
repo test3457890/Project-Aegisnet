@@ -24,7 +24,8 @@ export async function requireAuth(req: Request, res: Response, next: NextFunctio
     return res.status(401).json({ error: 'Missing authorization header' });
   }
 
-  const token = authHeader.split(' ')[1];
+  const match = /^Bearer ([A-Za-z0-9_-]+)$/i.exec(authHeader);
+  const token = match?.[1];
   if (!token) {
     return res.status(401).json({ error: 'Missing token in authorization header' });
   }

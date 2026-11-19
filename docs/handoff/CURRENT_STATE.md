@@ -1,5 +1,20 @@
 # Current State
 
+## November 19, 2026 verification update
+
+The complete web/API, SkyMesh Scout and training-board sources are present. Native
+Expo and Go components remain scaffolds. The API now refuses production startup
+before opening a database, seeding or creating uploads. Directly imported HTTP apps
+also deny production requests. Demo identity remains development-only and is not
+real authentication. Strict Bearer syntax does not make the demo token secure.
+
+Malformed JSON and oversized JSON return 400/413. Central error responses and logs
+omit request bodies and internal exception details. Root frontend tests/build and
+API tests/typecheck/smoke are executed separately; device, real-call, mesh, public
+deployment and production privacy guarantees remain unverified or unimplemented.
+Use `docs/Windows Verification.md` for the November 25 owner/Claude pass. Older
+status entries below are historical and do not establish production readiness.
+
 # AegisNet Project Status & Handoff
 
 ## Latest Verification (June 11, 2026 - Real-Time Multi-User Sync Foundation)

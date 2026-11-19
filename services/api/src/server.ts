@@ -25,6 +25,7 @@ import { requireAuth } from './middleware/auth';
 import rateLimit from 'express-rate-limit';
 import { AegisSecurityConfig } from './config/security';
 import { aegisGuard } from './security/aegisGuard';
+import { assertPrototypeEnvironment } from './config/prototype';
 
 config();
 
@@ -40,6 +41,15 @@ if (!isProduction) {
 
 export const app = express();
 
+app.use((_req, res, next) => {
+  try {
+    assertPrototypeEnvironment();
+    next();
+  } catch {
+    res.status(503).json({ error: 'The prototype API is disabled in production.' });
+  }
+});
+
 app.use((req, res, next) => {
   const requestId = crypto.randomUUID();
   (req as any).requestId = requestId;
@@ -54,7 +64,7 @@ app.use(cors({
       .split(",")
       .map((item) => item.trim());
     const isLocalDevelopment = /^http:\/\/(localhost|127\.0\.0\.1):\d+$/.test(origin);
-    callback(null, configured.includes(origin) || isLocalDevelopment);
+    callback(null, configured.includes(origin) || (!isProduction && isLocalDevelopment));
   },
   credentials: true
 }));
@@ -118,10 +128,12 @@ app.use('/trust', requireAuth, trustRouter);
 
 // Error handler
 app.use((err: any, req: express.Request, res: express.Response, _next: express.NextFunction) => {
-  console.error(err);
-  res.status(500).json({ 
-    error: 'The API could not complete that request.',
-    requestId: (err as any).requestId || (req as any).requestId,
-    ...(isProduction ? {} : { details: err.message })
+  const status = Number.isInteger(err.status) && err.status >= 400 && err.status < 500 ? err.status : 500;
+  const requestId = (req as any).requestId;
+  // Parser errors can carry the original private request body. Log metadata only.
+  console.error('[AegisNet API] Request failed', { requestId, status, name: err.name });
+  res.status(status).json({
+    error: status === 413 ? 'The request is too large.' : 'The API could not complete that request.',
+    requestId,
   });
 });

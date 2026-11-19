@@ -27,3 +27,10 @@ Track important product and technical decisions here.
 ## Public repository import
 
 Publish source, example configuration, and simulated documentation assets. Keep runtime databases, logs, uploads, credentials, and Drive working drafts out of the public repository. Run companion demos independently.
+# November 19 safety decision
+
+Enforce the documented prototype-only boundary in code: production API use is
+blocked until a separate authentication/privacy design is reviewed. Preserve the
+local fictional-data workflow; no new authentication, encryption or AI system is
+introduced. This is a safe implementation decision under the owner-requested
+security review, not owner approval for deployment.

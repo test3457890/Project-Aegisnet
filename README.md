@@ -27,6 +27,10 @@ Use Node.js 24 LTS and npm. Clone the repository or download its source ZIP and 
 
 The API listens on loopback at port 8000. The web UI can fall back to browser-local demo data if the API is unavailable. Use fictional data only. The prototype uses demo identity and simulated calls, and lacks production authentication and end-to-end encrypted messaging.
 
+The API refuses production startup and production HTTP requests while demo identity
+is in use. This is a development prototype, not a deployable private communications
+service. For the November 25 owner/Claude pass, use the [Windows checklist](docs/Windows%20Verification.md).
+
 For SkyMesh Scout and the Mission Board, see the [setup guide](docs/Getting-Started.md). The CAP-inspired board is a training demo with no claim of Civil Air Patrol approval or operational readiness.
 
 ## Project documentation
