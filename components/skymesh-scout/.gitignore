@@ -1,0 +1,14 @@
+# Never commit secrets or generated config
+config.secrets.json
+*.secrets.*
+*.key
+*.pem
+*.env
+.env
+__pycache__/
+*.pyc
+/tmp/
+aegisnet-support-bundle*.json
+aegisnet-test-*.json
+aegisnet-test-*.csv
+aegisnet-test-*.txt

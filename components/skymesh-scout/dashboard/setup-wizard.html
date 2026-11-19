@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AegisNet Node Setup</title>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0A0E13;--panel:#101822;--panel2:#0D131C;--line:#1E2A36;--cyan:#62D9F7;--cyan-dim:#2E6D80;--amber:#F0B541;--amber-dim:#6B4C14;--green:#5BCF8E;--red:#F06A5C;--txt:#C7D3DC;--dim:#6B7B88;--bright:#EDF2F5;--disp:'Rajdhani',system-ui;--mono:'IBM Plex Mono',ui-monospace}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--txt);font-family:var(--mono);font-size:14px;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:20px}
+.wizard{width:100%;max-width:620px}
+header{text-align:center;padding:24px 0 32px}
+header h1{font-family:var(--disp);font-size:26px;letter-spacing:.18em;color:#fff}
+header h1 b{color:var(--cyan)}
+header p{font-size:12px;color:var(--dim);margin-top:6px}
+.notice{border:1px solid var(--amber-dim);background:#120e00;border-radius:4px;padding:12px 14px;color:var(--amber);font-size:11.5px;line-height:1.7;margin-bottom:20px}
+.step{display:none;border:1px solid var(--line);border-radius:6px;background:var(--panel);overflow:hidden}
+.step.active{display:block}
+.step-head{background:var(--panel2);padding:14px 18px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:12px}
+.step-num{width:28px;height:28px;border-radius:50%;background:var(--cyan-dim);color:var(--cyan);font-family:var(--disp);font-weight:700;font-size:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.step-head h2{font-family:var(--disp);font-weight:600;font-size:16px;letter-spacing:.12em;color:var(--bright)}
+.step-body{padding:20px 18px;display:flex;flex-direction:column;gap:14px}
+.field{display:flex;flex-direction:column;gap:5px}
+.field label{font-size:11.5px;color:var(--dim);letter-spacing:.1em}
+.field input,.field select,.field textarea{background:var(--panel2);border:1px solid var(--line);color:var(--txt);font-family:var(--mono);padding:8px 10px;border-radius:3px;font-size:13px;width:100%}
+.field input:focus,.field select:focus{outline:none;border-color:var(--cyan-dim)}
+.field .hint{font-size:11px;color:var(--dim);margin-top:3px;line-height:1.5}
+.field .warn-hint{color:var(--amber)}
+.field input[type=checkbox]{width:18px;height:18px;accent-color:var(--cyan)}
+.check-row{display:flex;align-items:center;gap:10px;padding:4px 0}
+.check-row label{font-size:13px;color:var(--txt)}
+.btn-row{display:flex;gap:10px;justify-content:flex-end;padding:14px 18px;border-top:1px solid var(--line);background:var(--panel2)}
+.btn{font-family:var(--mono);font-size:13px;padding:8px 18px;border-radius:3px;cursor:pointer;border:1px solid var(--line);background:var(--panel);color:var(--txt)}
+.btn:hover{border-color:var(--cyan-dim);color:var(--cyan)}
+.btn.primary{background:rgba(98,217,247,.12);border-color:var(--cyan-dim);color:var(--cyan)}
+.progress{display:flex;gap:6px;justify-content:center;margin-bottom:20px}
+.progress span{width:8px;height:8px;border-radius:50%;background:var(--line)}
+.progress span.done{background:var(--cyan)}
+.progress span.active{background:var(--cyan);box-shadow:0 0 6px var(--cyan)}
+#statusMsg{padding:12px 14px;border-radius:4px;font-size:12px;margin-top:12px;display:none}
+#statusMsg.ok{background:rgba(91,207,142,.1);border:1px solid #1F6355;color:var(--green)}
+#statusMsg.err{background:rgba(240,106,92,.1);border:1px solid #5A2020;color:var(--red)}
+.node-id-box{font-family:var(--mono);font-size:13px;background:var(--panel2);border:1px solid var(--line);border-radius:3px;padding:10px 14px;color:var(--cyan);letter-spacing:.08em;word-break:break-all}
+</style>
+</head>
+<body>
+<div class="wizard">
+  <header>
+    <h1>AEGIS<b>NET</b></h1>
+    <p>Node Setup Wizard · Prototype 4.2</p>
+  </header>
+
+  <div class="notice">
+    ⚠ PROTOTYPE NODE · This wizard configures a prototype AegisNet node.
+    This is not an emergency-certified system. Not production-secure.
+    Does not use CAP, police, fire, EMS, aviation, or public safety radios.
+    Property owners must understand what this node does before installing it.
+  </div>
+
+  <div class="progress" id="progressBar"></div>
+
+  <!-- STEP 1: Node Identity -->
+  <div class="step active" id="step-1">
+    <div class="step-head"><div class="step-num">1</div><h2>NODE IDENTITY</h2></div>
+    <div class="step-body">
+      <div class="field">
+        <label>NODE NAME</label>
+        <input type="text" id="nodeName" placeholder="e.g. Example Home Node, AZ Relay, NJ Gateway" maxlength="40">
+        <div class="hint">Shown to other nodes on the mesh. Keep it descriptive.</div>
+      </div>
+      <div class="field">
+        <label>LOCATION LABEL</label>
+        <input type="text" id="nodeLocation" placeholder="e.g. Prescott AZ, Scottsdale, NJ Base" maxlength="40">
+        <div class="hint">Approximate location label — not GPS coordinates. Used for identification only.</div>
+      </div>
+      <div class="field">
+        <label>NODE ROLE</label>
+        <select id="nodeRole">
+          <option value="home">Home Node (always-on property node)</option>
+          <option value="relay">Relay Node (Router/Repeater, elevated)</option>
+          <option value="mobile">Mobile Node (carried device)</option>
+          <option value="field">Field Node (temporary deployment)</option>
+          <option value="test">Test Node (development / testing)</option>
+          <option value="demo">Demo Node (demo / showcase)</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>NODE ID <span style="color:var(--dim)">(auto-generated, can be changed)</span></label>
+        <div class="node-id-box" id="nodeIdDisplay">Generating…</div>
+        <div class="hint">Unique identifier for this node. Stored in config.json.</div>
+      </div>
+      <div class="field">
+        <label>VISIBILITY</label>
+        <div class="check-row"><input type="checkbox" id="nodePublic" checked><label for="nodePublic">Public node (visible to other mesh nodes)</label></div>
+        <div class="hint">Private mode: node participates but does not broadcast its presence.</div>
+      </div>
+    </div>
+    <div class="btn-row"><button class="btn primary" onclick="next(2)">NEXT →</button></div>
+  </div>
+
+  <!-- STEP 2: MQTT / Mesh -->
+  <div class="step" id="step-2">
+    <div class="step-head"><div class="step-num">2</div><h2>MESH & MQTT</h2></div>
+    <div class="step-body">
+      <div class="field">
+        <label>MQTT BROKER MODE</label>
+        <select id="mqttMode" onchange="updateMqttFields()">
+          <option value="community">Community (mqtt.meshtastic.org — free, slightly public)</option>
+          <option value="selfhost">Self-hosted (private broker on your own server)</option>
+          <option value="off">Off (local LoRa only, no internet bridge)</option>
+        </select>
+      </div>
+      <div class="field" id="selfHostField" style="display:none">
+        <label>SELF-HOSTED BROKER URL</label>
+        <input type="text" id="mqttSelfHost" placeholder="ws://yourserver:9001 or wss://yourserver:9001">
+        <div class="hint">WebSocket URL for your Mosquitto or other MQTT broker.</div>
+      </div>
+      <div class="field">
+        <label>MQTT REGION / CHANNEL</label>
+        <input type="text" id="mqttRegion" value="US" maxlength="10" placeholder="US">
+        <div class="hint">Usually US for North America. Matches Meshtastic region setting on your node.</div>
+      </div>
+      <div class="field">
+        <label>MESHTASTIC NODE</label>
+        <select id="meshNodeConn">
+          <option value="usb">USB serial (recommended for home nodes)</option>
+          <option value="ble">Bluetooth (mobile use)</option>
+          <option value="tcp">TCP (network-connected node)</option>
+          <option value="none">None / configure later</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>DEFAULT LOW-BANDWIDTH MODE</label>
+        <div class="check-row"><input type="checkbox" id="defaultLowBw"><label for="defaultLowBw">Start in low-bandwidth mode (text and alerts only)</label></div>
+        <div class="hint">Recommended for relay nodes or nodes with limited connectivity.</div>
+      </div>
+    </div>
+    <div class="btn-row">
+      <button class="btn" onclick="back(1)">← BACK</button>
+      <button class="btn primary" onclick="next(3)">NEXT →</button>
+    </div>
+  </div>
+
+  <!-- STEP 3: Tracking -->
+  <div class="step" id="step-3">
+    <div class="step-head"><div class="step-num">3</div><h2>TRACKING</h2></div>
+    <div class="step-body">
+      <div class="field">
+        <label>AIRCRAFT TRACKING</label>
+        <select id="aircraftMode">
+          <option value="demo">Demo mode (simulated traffic)</option>
+          <option value="local">Local ADS-B receiver (readsb / dump1090)</option>
+          <option value="api">Online APIs (FR24, ADSBx, OpenSky — configure keys in Admin)</option>
+          <option value="off">Disabled</option>
+        </select>
+        <div class="hint">Local receiver requires RTL-SDR dongle + 1090 MHz antenna + readsb.</div>
+      </div>
+      <div class="field">
+        <label>MARINE / AIS TRACKING</label>
+        <select id="aisMode">
+          <option value="demo">Demo mode (simulated vessels)</option>
+          <option value="local">Local AIS receiver (rtl-ais / pyais on port 10110)</option>
+          <option value="api">AIS API (AISHub or similar — configure key in Admin)</option>
+          <option value="off">Disabled</option>
+        </select>
+        <div class="hint warn-hint">⚠ Marine tracking is experimental. Legal AIS sources only. No scraping.</div>
+      </div>
+      <div class="field">
+        <label>TEAM NODE TRACKING</label>
+        <div class="check-row"><input type="checkbox" id="teamTracking" checked><label for="teamTracking">Show Meshtastic team nodes on map</label></div>
+      </div>
+      <div class="field">
+        <label>TRAIN TRACKING</label>
+        <div class="check-row"><input type="checkbox" id="trainTracking" checked><label for="trainTracking">Show Amtrak / public transit (demo + official APIs only)</label></div>
+        <div class="hint">Freight train locations are not public. Only official/approved sources used.</div>
+      </div>
+      <div class="field">
+        <label>PROJECTOR MODE</label>
+        <div class="check-row"><input type="checkbox" id="projectorEnabled" checked><label for="projectorEnabled">Enable projector display (ceiling/wall)</label></div>
+      </div>
+    </div>
+    <div class="btn-row">
+      <button class="btn" onclick="back(2)">← BACK</button>
+      <button class="btn primary" onclick="next(4)">NEXT →</button>
+    </div>
+  </div>
+
+  <!-- STEP 4: Access & Security -->
+  <div class="step" id="step-4">
+    <div class="step-head"><div class="step-num">4</div><h2>ACCESS & SECURITY</h2></div>
+    <div class="step-body">
+      <div class="field">
+        <label>DASHBOARD ACCESS</label>
+        <select id="dashAccess">
+          <option value="local">Local network only (recommended)</option>
+          <option value="guest">Local + guest read-only (no transmit controls for guests)</option>
+          <option value="open">Open (no password — not recommended)</option>
+        </select>
+        <div class="hint warn-hint">⚠ Do not expose port 8080 to the public internet without authentication and VPN/tunnel.</div>
+      </div>
+      <div class="field">
+        <label>NODE CONTACT LABEL <span style="color:var(--dim)">(optional)</span></label>
+        <input type="text" id="nodeContact" placeholder="e.g. Example Team / operator@example.com" maxlength="60">
+        <div class="hint">Shown in node status — helps identify the node owner. Optional. Not synced to cloud.</div>
+      </div>
+      <div class="notice" style="margin:0">
+        API keys, passwords, and shared secrets are stored in config.json (server-side only).
+        They are never sent to the frontend in guest mode. Do not share config.json with untrusted parties.
+      </div>
+    </div>
+    <div class="btn-row">
+      <button class="btn" onclick="back(3)">← BACK</button>
+      <button class="btn primary" onclick="next(5)">NEXT →</button>
+    </div>
+  </div>
+
+  <!-- STEP 5: Acknowledgments -->
+  <div class="step" id="step-5">
+    <div class="step-head"><div class="step-num">5</div><h2>ACKNOWLEDGMENTS</h2></div>
+    <div class="step-body">
+      <p style="font-size:12px;color:var(--dim);line-height:1.8;margin-bottom:4px">Before completing setup, please confirm:</p>
+      <div class="check-row"><input type="checkbox" id="ack1"><label for="ack1">I understand this is a prototype system, not an emergency-certified product.</label></div>
+      <div class="check-row"><input type="checkbox" id="ack2"><label for="ack2">This node does not use CAP, police, fire, EMS, aviation, or public safety radios.</label></div>
+      <div class="check-row"><input type="checkbox" id="ack3"><label for="ack3">I am the property owner or have permission to install this node here.</label></div>
+      <div class="check-row"><input type="checkbox" id="ack4"><label for="ack4">I understand tracking data may be delayed, incomplete, simulated, or unavailable.</label></div>
+      <div class="check-row"><input type="checkbox" id="ack5"><label for="ack5">I will not use this node for purposes that violate local laws or regulations.</label></div>
+    </div>
+    <div class="btn-row">
+      <button class="btn" onclick="back(4)">← BACK</button>
+      <button class="btn primary" id="finishBtn" onclick="saveConfig()" disabled>SAVE & FINISH</button>
+    </div>
+  </div>
+
+  <!-- STEP 6: Done -->
+  <div class="step" id="step-6">
+    <div class="step-head"><div class="step-num">✓</div><h2>SETUP COMPLETE</h2></div>
+    <div class="step-body">
+      <div style="color:var(--green);font-size:14px;margin-bottom:12px">Node configuration saved.</div>
+      <div id="summaryBox" style="background:var(--panel2);border:1px solid var(--line);border-radius:3px;padding:12px 14px;font-size:12px;line-height:2;color:var(--dim)"></div>
+    </div>
+    <div class="btn-row">
+      <a href="/" class="btn primary" style="text-decoration:none">OPEN DASHBOARD →</a>
+    </div>
+  </div>
+
+  <div id="statusMsg"></div>
+</div>
+
+<script>
+let _currentStep = 1;
+const TOTAL_STEPS = 5;
+
+// Generate or load node ID
+const STORED_ID = localStorage.getItem("aegisnet_nodeId");
+const NODE_ID = STORED_ID || ("aegis-" + Math.random().toString(16).slice(2,10));
+localStorage.setItem("aegisnet_nodeId", NODE_ID);
+document.addEventListener("DOMContentLoaded", () => {
+  document.getElementById("nodeIdDisplay").textContent = NODE_ID;
+  renderProgress();
+  // Load existing wizard values from localStorage
+  ["nodeName","nodeLocation","nodeRole","mqttMode","mqttRegion","mqttSelfHost",
+   "meshNodeConn","aircraftMode","aisMode","dashAccess","nodeContact"].forEach(id => {
+    const el = document.getElementById(id);
+    const v = localStorage.getItem("wiz_" + id);
+    if (el && v) el.value = v;
+  });
+  ["nodePublic","defaultLowBw","teamTracking","trainTracking","projectorEnabled"].forEach(id => {
+    const el = document.getElementById(id);
+    const v = localStorage.getItem("wiz_" + id);
+    if (el && v !== null) el.checked = v === "true";
+  });
+  updateMqttFields();
+  wireAckCheck();
+});
+
+function renderProgress() {
+  const bar = document.getElementById("progressBar");
+  bar.innerHTML = Array.from({length: TOTAL_STEPS}, (_,i) =>
+    `<span class="${i+1 < _currentStep ? "done" : i+1 === _currentStep ? "active" : ""}"></span>`
+  ).join("");
+}
+function next(n) {
+  saveStep(_currentStep);
+  document.getElementById("step-" + _currentStep).classList.remove("active");
+  _currentStep = n;
+  document.getElementById("step-" + n)?.classList.add("active");
+  renderProgress();
+  window.scrollTo(0,0);
+}
+function back(n) { next(n); }
+function saveStep(n) {
+  ["nodeName","nodeLocation","nodeRole","mqttMode","mqttRegion","mqttSelfHost",
+   "meshNodeConn","aircraftMode","aisMode","dashAccess","nodeContact"].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) localStorage.setItem("wiz_" + id, el.value);
+  });
+  ["nodePublic","defaultLowBw","teamTracking","trainTracking","projectorEnabled"].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) localStorage.setItem("wiz_" + id, el.checked);
+  });
+}
+function updateMqttFields() {
+  const mode = document.getElementById("mqttMode")?.value;
+  const sf = document.getElementById("selfHostField");
+  if (sf) sf.style.display = mode === "selfhost" ? "" : "none";
+}
+function wireAckCheck() {
+  const acks = ["ack1","ack2","ack3","ack4","ack5"];
+  const btn = document.getElementById("finishBtn");
+  acks.forEach(id => {
+    document.getElementById(id)?.addEventListener("change", () => {
+      btn.disabled = !acks.every(a => document.getElementById(a)?.checked);
+    });
+  });
+}
+
+function saveConfig() {
+  saveStep(_currentStep);
+  const mqttMode = document.getElementById("mqttMode")?.value || "community";
+  const cfg = {
+    nodeId: NODE_ID,
+    nodeName: document.getElementById("nodeName")?.value || "AegisNet Node",
+    nodeLocation: document.getElementById("nodeLocation")?.value || "",
+    nodeRole: document.getElementById("nodeRole")?.value || "home",
+    nodePublic: document.getElementById("nodePublic")?.checked ?? true,
+    nodeContact: document.getElementById("nodeContact")?.value || "",
+    mqttBroker: mqttMode === "off" ? "" : "mqtt.meshtastic.org",
+    mqttSelfHost: mqttMode === "selfhost" ? (document.getElementById("mqttSelfHost")?.value || "") : "",
+    mqttEnabled: mqttMode !== "off",
+    mqttRegion: document.getElementById("mqttRegion")?.value || "US",
+    meshNodeConn: document.getElementById("meshNodeConn")?.value || "usb",
+    defaultLowBandwidth: document.getElementById("defaultLowBw")?.checked ?? false,
+    guestMode: document.getElementById("dashAccess")?.value === "guest",
+    aircraftMode: document.getElementById("aircraftMode")?.value || "demo",
+    aisEnabled: document.getElementById("aisMode")?.value !== "off",
+    aisMode: document.getElementById("aisMode")?.value || "demo",
+    features: {
+      ships: document.getElementById("aisMode")?.value !== "off",
+      trains: document.getElementById("trainTracking")?.checked ?? true,
+      projector: document.getElementById("projectorEnabled")?.checked ?? true,
+      teamTracking: document.getElementById("teamTracking")?.checked ?? true
+    },
+    wizardComplete: true,
+    setupAt: new Date().toISOString()
+  };
+
+  const msg = document.getElementById("statusMsg");
+
+  fetch("/api/config/save", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(cfg)
+  }).then(r => r.ok ? r.json() : Promise.reject("Server error " + r.status))
+    .then(() => showDone(cfg))
+    .catch(e => {
+      // If server save fails, save to localStorage as fallback
+      localStorage.setItem("aegisnet_config_pending", JSON.stringify(cfg));
+      msg.className = "err"; msg.style.display = "";
+      msg.textContent = "Could not save to server (" + e + "). Config saved locally — apply manually from Admin.";
+      // Still advance to done
+      setTimeout(() => showDone(cfg), 1200);
+    });
+}
+
+function showDone(cfg) {
+  document.getElementById("step-" + _currentStep).classList.remove("active");
+  document.getElementById("step-6").classList.add("active");
+  _currentStep = 6;
+  renderProgress();
+  document.getElementById("summaryBox").innerHTML = `
+    <div>Node ID: <b style="color:var(--cyan)">${cfg.nodeId}</b></div>
+    <div>Name: <b style="color:var(--txt)">${cfg.nodeName}</b></div>
+    <div>Location: <b style="color:var(--txt)">${cfg.nodeLocation || "—"}</b></div>
+    <div>Role: <b style="color:var(--txt)">${cfg.nodeRole}</b></div>
+    <div>MQTT: <b style="color:var(--txt)">${cfg.mqttEnabled ? (cfg.mqttSelfHost || "mqtt.meshtastic.org") : "OFF"}</b></div>
+    <div>Aircraft: <b style="color:var(--txt)">${cfg.aircraftMode}</b></div>
+    <div>AIS: <b style="color:var(--txt)">${cfg.aisMode}</b></div>
+    <div style="color:var(--amber);font-size:11px;margin-top:8px">⚠ API keys must be set in Admin → API Connectors (not in this wizard)</div>`;
+  window.scrollTo(0,0);
+}
+</script>
+</body>
+</html>

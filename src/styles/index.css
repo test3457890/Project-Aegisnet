@@ -1,0 +1,14 @@
+@import './fonts.css';
+@import './tailwind.css';
+@import './theme.css';
+
+@layer utilities {
+  .scrollbar-clean {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  .scrollbar-clean::-webkit-scrollbar {
+    display: none;
+  }
+}
+
