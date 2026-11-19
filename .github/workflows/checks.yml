@@ -21,7 +21,7 @@ jobs:
       - run: npm test
       - run: npm run build
       - run: npm audit --audit-level=high
-      - run: npx playwright install --with-deps chrome
+      - run: google-chrome --version
       - run: npm run test:browser
   api:
     runs-on: ubuntu-latest

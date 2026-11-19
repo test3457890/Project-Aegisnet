@@ -141,7 +141,7 @@ export function MissionRoomScreen() {
 
       {hasUpdates && tab !== "catchup" && (
         <div className="flex justify-center bg-blue-500/10 border-b border-blue-500/20 px-4 py-2 cursor-pointer hover:bg-blue-500/20 transition-colors" onClick={() => setTab("catchup")}>
-          <span className="text-xs font-bold text-blue-400 flex items-center gap-2">
+          <span className="text-xs font-bold text-accent-readable flex items-center gap-2">
             <Activity size={14} /> Catch up available - New updates since you last checked. Click to view.
           </span>
         </div>
