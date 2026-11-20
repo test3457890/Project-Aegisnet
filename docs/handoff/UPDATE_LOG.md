@@ -1540,3 +1540,7 @@ entries. The first API test failed because --ignore-scripts omitted SQLite's nat
 binding; rebuilding that dependency resolved it. Go compilation is blocked by the
 available command/toolchain. No real calls, native hardware or fresh screenshots
 were tested. Exact-commit CI and the Windows checklist remain review evidence.
+# November 20, 2026 accessibility check follow-up
+
+Split the seven-theme, eight-route accessibility sweep into one test per theme with a 60-second timeout. This keeps all 56 combinations and reports the failing theme independently. Local frontend unit tests passed (122), and the production build passed. Browser execution in this workspace was blocked before page load because Chromium could not create its process singleton socket (`Operation not permitted`); the GitHub CI browser run is required for verification. No application behavior changed.
+
