@@ -166,3 +166,9 @@ The Admin Center prototype applied several AMI lessons:
 * **Don't mix mock security with real claims (#17, #22):** every admin/audit/support surface is clearly
   labelled local prototype, and tickets state plainly they are "saved locally, not submitted externally."
 RBAC enforcement, MFA, and the real Stuff Studios LLC support endpoint remain future work — see NEXT_STEPS.
+# November 19 engineering lesson
+
+A prototype warning alone does not prevent deployment. Reject production mode
+before importing modules that create databases or upload folders, and test both
+the actual entry point and a directly imported HTTP app. Parser errors can contain
+private request bodies; log only bounded operational metadata, not whole errors.

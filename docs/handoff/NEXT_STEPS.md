@@ -246,3 +246,16 @@ The Mission Room Command Workspace sprint relies entirely on local prototype sta
 ## Public import follow-up
 
 Verify the native mobile scaffold on devices and validate optional live hardware paths independently. See [Verification and limits](../Verification.md).
+# November 19 review status
+
+Completed in the review branch: production demo-API lockout, strict Bearer parsing,
+privacy-safe central parser errors, and regression tests. Before any deployment,
+review real authentication/authorization and attachment privacy as a separate
+approved design. Do not enable the demo API in production. Native scaffolds, real
+calls, hardware transports and Windows visual acceptance remain pending. Use the
+Windows Verification checklist; no new operational capability is claimed here.
+# November 20 accessibility CI follow-up
+
+- [ ] Confirm that the split accessibility tests pass on the exact PR commit in GitHub Actions, including desktop and mobile projects.
+- [ ] If a theme still times out, inspect its trace and route timing before changing coverage or limits.
+
