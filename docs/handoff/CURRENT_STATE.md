@@ -1,5 +1,9 @@
 # Current State
 
+## November 20, 2026 accessibility CI follow-up
+
+The accessibility route sweep is split by theme so each theme has its own result and timeout. All 56 route/theme combinations remain. Frontend unit tests and build passed locally. Browser execution is pending CI because local Chromium cannot start in this workspace.
+
 ## November 19, 2026 verification update
 
 The complete web/API, SkyMesh Scout and training-board sources are present. Native
