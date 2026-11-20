@@ -254,3 +254,8 @@ review real authentication/authorization and attachment privacy as a separate
 approved design. Do not enable the demo API in production. Native scaffolds, real
 calls, hardware transports and Windows visual acceptance remain pending. Use the
 Windows Verification checklist; no new operational capability is claimed here.
+# November 20 accessibility CI follow-up
+
+- [ ] Confirm that the split accessibility tests pass on the exact PR commit in GitHub Actions, including desktop and mobile projects.
+- [ ] If a theme still times out, inspect its trace and route timing before changing coverage or limits.
+
