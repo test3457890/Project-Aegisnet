@@ -394,24 +394,24 @@ test("keyboard-only dialogs open, retain focus, and close with Escape", async ({
   await expect(manageButton).toBeFocused();
 });
 
-test("@a11y main routes have no serious or critical accessibility violations", async ({ page }) => {
-  test.setTimeout(90000); // 90 seconds for 42 routes
-  const routes = [
-    "/app",
-    "/app/private/group/chat_family",
-    "/app/network/net_family/room/room_fam_chat",
-    "/app/network/net_sar/mission/room_sar_mission",
-    "/app/vault",
-    "/app/private/dm/chat_sarah/call/voice",
-    "/app/settings",
-    "/app/admin",
-  ];
+const accessibilityRoutes = [
+  "/app",
+  "/app/private/group/chat_family",
+  "/app/network/net_family/room/room_fam_chat",
+  "/app/network/net_sar/mission/room_sar_mission",
+  "/app/vault",
+  "/app/private/dm/chat_sarah/call/voice",
+  "/app/settings",
+  "/app/admin",
+];
 
-  const themes = ["social-dark", "midnight", "warm", "signal", "field", "night", "high-contrast"];
+const accessibilityThemes = ["social-dark", "midnight", "warm", "signal", "field", "night", "high-contrast"];
 
-  for (const theme of themes) {
+for (const theme of accessibilityThemes) {
+  test(`@a11y main routes in ${theme} have no serious or critical accessibility violations`, async ({ page }) => {
+    test.setTimeout(60_000);
     await page.evaluate((t) => localStorage.setItem("aegis-theme", t), theme);
-    for (const route of routes) {
+    for (const route of accessibilityRoutes) {
       await page.goto(route);
       await page.waitForTimeout(400); // Wait for animate-in fade-in
       const results = await new AxeBuilder({ page })
@@ -420,8 +420,8 @@ test("@a11y main routes have no serious or critical accessibility violations", a
       const important = results.violations.filter((violation) => violation.impact === "serious" || violation.impact === "critical");
       expect(important, `[${theme}] ${route}: ${important.map((item) => `${item.id} (${item.nodes.length})`).join(", ")}`).toEqual([]);
     }
-  }
-});
+  });
+}
 
 test("@a11y lock screen has no serious or critical accessibility violations", async ({ page }) => {
   const themes = ["social-dark", "midnight", "warm", "signal", "field", "night", "high-contrast"];
